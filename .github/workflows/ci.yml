@@ -26,6 +26,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Fix known pom.xml typo
+        run: sed -i 's/<relativeTo\/>/<relativePath\/>/g' pom.xml
+
       - name: Generate Maven wrapper
         run: mvn wrapper:wrapper -B
 
@@ -78,6 +81,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Fix known pom.xml typo
+        run: sed -i 's/<relativeTo\/>/<relativePath\/>/g' pom.xml
+
       - name: Generate Maven wrapper
         run: mvn wrapper:wrapper -B
 
@@ -117,6 +123,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Fix known pom.xml typo
+        run: sed -i 's/<relativeTo\/>/<relativePath\/>/g' pom.xml
+
       - name: Generate Maven wrapper
         run: mvn wrapper:wrapper -B
 
@@ -140,7 +149,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy FS Scan
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.30.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
