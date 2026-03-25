@@ -19,9 +19,13 @@ client/.angular/
 # Server
 server/dist/
 
-# Playwright
+# Playwright - ignore built-in HTML report (we generate our own)
+e2e/playwright-report/
 e2e/test-results/trace/
-# Keep playwright-report.zip but ignore other zips (trace archives)
+# Keep our custom report, screenshots, results JSON, and zip
+!e2e/test-results/report.html
+!e2e/test-results/results.json
+!e2e/test-results/screenshots/
 !e2e/test-results/playwright-report.zip
 
 # OS

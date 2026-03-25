@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playwright Test Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+    .header { background: linear-gradient(135deg, #1a237e 0%, #283593 100%); color: white; padding: 32px; }
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header .subtitle { opacity: 0.85; font-size: 14px; }
+    .stats { display: flex; gap: 24px; padding: 24px 32px; background: white; border-bottom: 1px solid #e0e0e0; }
+    .stat { text-align: center; }
+    .stat .value { font-size: 32px; font-weight: 700; }
+    .stat .label { font-size: 12px; text-transform: uppercase; color: #666; }
+    .stat.passed .value { color: #2e7d32; }
+    .stat.failed .value { color: #c62828; }
+    .stat.duration .value { color: #1565c0; }
+    .container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+    .suite { background: white; border-radius: 8px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+    .suite-header { padding: 16px 24px; background: #fafafa; border-bottom: 1px solid #e0e0e0; }
+    .suite-header h2 { font-size: 18px; color: #1a237e; }
+    .suite-header .file { font-size: 12px; color: #888; font-family: monospace; }
+    .test { border-bottom: 1px solid #f0f0f0; }
+    .test:last-child { border-bottom: none; }
+    .test-header { padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+    .badge.passed { background: #e8f5e9; color: #2e7d32; }
+    .badge.failed { background: #ffebee; color: #c62828; }
+    .test-title { font-size: 15px; flex: 1; }
+    .test-duration { font-size: 12px; color: #999; }
+    .screenshots { padding: 0 24px 16px 24px; }
+    .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 16px; }
+    .screenshot-card { border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
+    .screenshot-card img { width: 100%; display: block; }
+    .screenshot-card .caption { padding: 8px 12px; font-size: 12px; color: #666; background: #fafafa; border-top: 1px solid #e0e0e0; font-family: monospace; }
+    .footer { text-align: center; padding: 32px; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Playwright E2E Test Report</h1>
+    <div class="subtitle">Loan Management Application &mdash; Generated 2026-03-25 17:06:26 UTC</div>
+  </div>
+  <div class="stats">
+    <div class="stat passed"><div class="value">12</div><div class="label">Passed</div></div>
+    <div class="stat failed"><div class="value">0</div><div class="label">Failed</div></div>
+    <div class="stat"><div class="value">12</div><div class="label">Total</div></div>
+    <div class="stat duration"><div class="value">11.1s</div><div class="label">Duration</div></div>
+  </div>
+  <div class="container">
+
+    <div class="suite">
+      <div class="suite-header">
+        <h2>Borrower Detail Page</h2>
+        <div class="file">borrower-detail.spec.ts</div>
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays contact information card</span>
+          <span class="test-duration">392ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-detail-contact.png" alt="borrower-detail-contact.png" loading="lazy" />
+              <div class="caption">borrower-detail-contact.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays financial profile card</span>
+          <span class="test-duration">418ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-detail-financial.png" alt="borrower-detail-financial.png" loading="lazy" />
+              <div class="caption">borrower-detail-financial.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays associated loans table</span>
+          <span class="test-duration">403ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-detail-loans.png" alt="borrower-detail-loans.png" loading="lazy" />
+              <div class="caption">borrower-detail-loans.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="suite">
+      <div class="suite-header">
+        <h2>Borrower List Page</h2>
+        <div class="file">borrower-list.spec.ts</div>
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays all test borrowers in the table</span>
+          <span class="test-duration">351ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-list-all-borrowers.png" alt="borrower-list-all-borrowers.png" loading="lazy" />
+              <div class="caption">borrower-list-all-borrowers.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">shows borrower details in columns</span>
+          <span class="test-duration">355ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-list-details.png" alt="borrower-list-details.png" loading="lazy" />
+              <div class="caption">borrower-list-details.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">navigates to borrower detail when clicking view icon</span>
+          <span class="test-duration">523ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-list-before-nav.png" alt="borrower-list-before-nav.png" loading="lazy" />
+              <div class="caption">borrower-list-before-nav.png</div>
+            </div>
+
+            <div class="screenshot-card">
+              <img src="./screenshots/borrower-list-after-nav.png" alt="borrower-list-after-nav.png" loading="lazy" />
+              <div class="caption">borrower-list-after-nav.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="suite">
+      <div class="suite-header">
+        <h2>Loan Detail Page</h2>
+        <div class="file">loan-detail.spec.ts</div>
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays loan summary card with correct data</span>
+          <span class="test-duration">392ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-detail-summary.png" alt="loan-detail-summary.png" loading="lazy" />
+              <div class="caption">loan-detail-summary.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays property information</span>
+          <span class="test-duration">405ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-detail-property.png" alt="loan-detail-property.png" loading="lazy" />
+              <div class="caption">loan-detail-property.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays payment history table with correct rows</span>
+          <span class="test-duration">391ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-detail-payments.png" alt="loan-detail-payments.png" loading="lazy" />
+              <div class="caption">loan-detail-payments.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="suite">
+      <div class="suite-header">
+        <h2>Loan List Page</h2>
+        <div class="file">loan-list.spec.ts</div>
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">displays all test loans in the table</span>
+          <span class="test-duration">375ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-list-all-loans.png" alt="loan-list-all-loans.png" loading="lazy" />
+              <div class="caption">loan-list-all-loans.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">shows correct financial data and status</span>
+          <span class="test-duration">340ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-list-financial-data.png" alt="loan-list-financial-data.png" loading="lazy" />
+              <div class="caption">loan-list-financial-data.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="test">
+        <div class="test-header">
+          <span class="badge passed">passed</span>
+          <span class="test-title">navigates to loan detail when clicking view icon</span>
+          <span class="test-duration">548ms</span>
+        </div>
+
+        <div class="screenshots">
+          <div class="screenshots-grid">
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-list-before-nav.png" alt="loan-list-before-nav.png" loading="lazy" />
+              <div class="caption">loan-list-before-nav.png</div>
+            </div>
+
+            <div class="screenshot-card">
+              <img src="./screenshots/loan-list-after-nav.png" alt="loan-list-after-nav.png" loading="lazy" />
+              <div class="caption">loan-list-after-nav.png</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  <div class="footer">
+    Playwright HTML Report &mdash; 12 tests across 4 suites
+  </div>
+</body>
+</html>

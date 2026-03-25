@@ -6,7 +6,11 @@ export default defineConfig({
   forbidOnly: true,
   retries: 0,
   workers: 1,
-  reporter: [['html', { outputFolder: 'test-results', open: 'never' }]],
+  reporter: [
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-results/results.json' }],
+  ],
+  outputDir: 'playwright-report/artifacts',
   use: {
     baseURL: 'http://localhost:4200',
     trace: 'on-first-retry',

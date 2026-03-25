@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import * as path from 'path';
+
+const screenshotDir = path.join(__dirname, '..', 'test-results', 'screenshots');
 
 test.describe('Borrower Detail Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,22 +10,24 @@ test.describe('Borrower Detail Page', () => {
   });
 
   test('displays contact information card', async ({ page }) => {
-    // Header
     await expect(page.locator('h2')).toContainText('Alice Test');
     await expect(page.locator('.borrower-id')).toContainText('T-B001');
 
-    // Contact card
     const contact = page.locator('mat-card').filter({ hasText: 'Contact Information' });
     await expect(contact.getByText('alice.test@email.com')).toBeVisible();
     await expect(contact.getByText('217-555-0001')).toBeVisible();
     await expect(contact.getByText('Springfield')).toBeVisible();
     await expect(contact.getByText('IL', { exact: true })).toBeVisible();
+
+    await page.screenshot({ path: path.join(screenshotDir, 'borrower-detail-contact.png'), fullPage: true });
   });
 
   test('displays financial profile card', async ({ page }) => {
     const financial = page.locator('mat-card').filter({ hasText: 'Financial Profile' });
     await expect(financial.getByText('750')).toBeVisible();
     await expect(financial.getByText('EMPLOYED')).toBeVisible();
+
+    await page.screenshot({ path: path.join(screenshotDir, 'borrower-detail-financial.png'), fullPage: true });
   });
 
   test('displays associated loans table', async ({ page }) => {
@@ -38,5 +43,7 @@ test.describe('Borrower Detail Page', () => {
     await expect(loansCard.getByText('$230,000.00')).toBeVisible();
     await expect(loansCard.getByText('4.500%')).toBeVisible();
     await expect(loansCard.locator('mat-chip')).toContainText('Active');
+
+    await page.screenshot({ path: path.join(screenshotDir, 'borrower-detail-loans.png'), fullPage: true });
   });
 });
