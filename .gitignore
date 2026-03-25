@@ -20,8 +20,9 @@ client/.angular/
 server/dist/
 
 # Playwright
-e2e/test-results/*.zip
 e2e/test-results/trace/
+# Keep playwright-report.zip but ignore other zips (trace archives)
+!e2e/test-results/playwright-report.zip
 
 # OS
 .DS_Store
