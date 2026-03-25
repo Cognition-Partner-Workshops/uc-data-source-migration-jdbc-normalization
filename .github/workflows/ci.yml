@@ -26,6 +26,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Generate Maven wrapper
+        run: mvn wrapper:wrapper -B
+
       - name: Grant Maven wrapper execute permission
         run: chmod +x mvnw
 
@@ -75,6 +78,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Generate Maven wrapper
+        run: mvn wrapper:wrapper -B
+
       - name: Grant Maven wrapper execute permission
         run: chmod +x mvnw
 
@@ -110,6 +116,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Generate Maven wrapper
+        run: mvn wrapper:wrapper -B
 
       - name: Grant Maven wrapper execute permission
         run: chmod +x mvnw
