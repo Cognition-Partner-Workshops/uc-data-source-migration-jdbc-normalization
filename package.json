@@ -1,0 +1,17 @@
+{
+  "name": "uc-data-source-migration-legacy-to-modern",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Loan management application — Angular frontend + Express.js backend",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npx ng serve --proxy-config proxy.conf.json",
+    "dev": "npm run dev:server & npm run dev:client",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npx ng build",
+    "build": "npm run build:server && npm run build:client",
+    "start": "cd server && npm start",
+    "test": "cd server && npm test"
+  },
+  "license": "MIT"
+}

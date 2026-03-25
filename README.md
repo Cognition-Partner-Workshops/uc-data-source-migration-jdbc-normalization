@@ -1,6 +1,6 @@
 # Data Source Migration: Legacy to Modern
 
-A small Spring Boot loan management application that currently connects to a **legacy data warehouse** (simulated via H2 with legacy-style schemas). The workshop challenge is to migrate the data source to a **modern schema** while keeping the application functional.
+A loan management application with an **Angular** frontend and **Express.js** backend that reads from a legacy data warehouse schema. The workshop challenge is to migrate the data source to a modern normalized schema while keeping the application functional.
 
 ## Overview
 
@@ -9,19 +9,25 @@ This app manages loan data: borrowers, loan products, loan accounts, and payment
 ## Architecture
 
 ```
-┌─────────────────────────────┐
-│   Loan Service (Spring Boot)│
-│                             │
-│  Controllers ─► Services    │
-│                  │          │
-│              Repositories   │
-│                  │          │
-│         Legacy DataSource   │  ← YOU ARE HERE
-│         (H2 / legacy schema)│
-│                             │
-│         Modern DataSource   │  ← MIGRATE TO HERE
-│         (H2 / modern schema)│
-└─────────────────────────────┘
+┌──────────────────────────────────────────────────┐
+│  Angular Frontend (client/)                      │
+│  Angular 17 · Angular Material · Standalone      │
+│  Pages: /loans, /loans/:id,                      │
+│         /borrowers, /borrowers/:id               │
+└──────────────┬───────────────────────────────────┘
+               │ HTTP (port 4200 → proxy → 3000)
+┌──────────────▼───────────────────────────────────┐
+│  Express.js Backend (server/)                    │
+│  TypeScript · CORS · sql.js (in-memory SQLite)   │
+│                                                  │
+│  Routes ─► Services ─► sql.js Database           │
+│                                                  │
+│         Legacy DataSource                        │
+│         (CDW_* legacy schema)  ← YOU ARE HERE    │
+│                                                  │
+│         Modern DataSource                        │
+│         (normalized schema)    ← MIGRATE TO HERE │
+└──────────────────────────────────────────────────┘
 ```
 
 ## Current State (Legacy)
@@ -47,23 +53,52 @@ See `data/modern-schema/` for target DDL.
 ## Quick Start
 
 ```bash
-./mvnw spring-boot:run
+# Install dependencies
+cd server && npm install && cd ..
+cd client && npm install && cd ..
+
+# Run backend (port 3000)
+cd server && npm run dev
+
+# Run frontend (port 4200) — in another terminal
+cd client && npx ng serve --proxy-config proxy.conf.json
 ```
 
-The app runs on `http://localhost:8080` with endpoints:
+The frontend runs on `http://localhost:4200` and proxies API requests to the backend on port 3000.
+
+### API Endpoints (backend)
+
 - `GET /api/loans` — List all loans
 - `GET /api/loans/{id}` — Get loan details
+- `GET /api/loans/{loanId}/payments` — Payment history for a loan
 - `GET /api/borrowers` — List borrowers
 - `GET /api/borrowers/{id}` — Get borrower with loans
-- `GET /api/payments/loan/{loanId}` — Payment history for a loan
 
 ## Tech Stack
 
-- Java 17
-- Spring Boot 3.2
-- Spring Data JPA
-- H2 (in-memory, simulating legacy DW)
-- Maven
+- **Frontend:** Angular 17, Angular Material, TypeScript, SCSS
+- **Backend:** Express.js, TypeScript, sql.js (SQLite in WASM)
+- **Database:** In-memory SQLite (loaded from legacy SQL seed files)
+- **Build:** npm workspaces
+
+## Project Structure
+
+```
+├── client/             # Angular 17 frontend
+│   └── src/app/
+│       ├── models/     # TypeScript interfaces
+│       ├── services/   # HTTP services
+│       └── pages/      # Page components (loan-list, loan-detail, etc.)
+├── server/             # Express.js backend
+│   ├── db/             # SQL schema & seed files
+│   └── src/
+│       ├── models/     # Legacy & DTO interfaces
+│       ├── services/   # Business logic (legacy translation)
+│       ├── routes/     # Express route handlers
+│       └── utils/      # Legacy data transformers
+├── data/               # Workshop reference files (schemas, mappings)
+└── docs/               # Migration task documentation
+```
 
 ## License
 

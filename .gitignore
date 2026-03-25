@@ -1,3 +1,4 @@
+# Java (legacy — removed)
 target/
 *.class
 *.jar
@@ -5,4 +6,19 @@ target/
 .idea/
 *.iml
 .DS_Store
-.mvn/wrapper/maven-wrapper.jar
+
+# Node / npm
+node_modules/
+dist/
+.env
+
+# Angular
+client/dist/
+client/.angular/
+
+# Server
+server/dist/
+
+# OS
+.DS_Store
+Thumbs.db

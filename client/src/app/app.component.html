@@ -1,0 +1,18 @@
+<mat-toolbar color="primary">
+  <mat-icon>account_balance</mat-icon>
+  <span class="toolbar-title">{{ title }}</span>
+  <nav>
+    <a mat-button routerLink="/loans" routerLinkActive="active-link">
+      <mat-icon>receipt_long</mat-icon>
+      Loans
+    </a>
+    <a mat-button routerLink="/borrowers" routerLinkActive="active-link">
+      <mat-icon>people</mat-icon>
+      Borrowers
+    </a>
+  </nav>
+</mat-toolbar>
+
+<div class="page-content">
+  <router-outlet></router-outlet>
+</div>
