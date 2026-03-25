@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, initial-code ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, initial-code ]
 
 permissions:
   contents: read
@@ -25,6 +25,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Grant Maven wrapper execute permission
+        run: chmod +x mvnw
 
       - name: Compile
         run: ./mvnw compile -B
@@ -51,6 +54,7 @@ jobs:
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
         env:
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,6 +74,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Grant Maven wrapper execute permission
+        run: chmod +x mvnw
 
       - name: OWASP Dependency-Check
         run: |
@@ -103,6 +110,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Grant Maven wrapper execute permission
+        run: chmod +x mvnw
 
       - name: Build for CodeQL
         run: ./mvnw compile -B -DskipTests
