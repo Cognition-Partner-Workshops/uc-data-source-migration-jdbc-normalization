@@ -11,6 +11,7 @@ import com.workshop.loanservice.repository.LegacyBorrowerRepository;
 import com.workshop.loanservice.repository.LegacyLoanAccountRepository;
 import com.workshop.loanservice.repository.LegacyLoanProductRepository;
 import com.workshop.loanservice.repository.LegacyPaymentRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,9 +27,13 @@ import java.util.stream.Collectors;
  * between legacy string-typed fields and proper Java types.
  * When switching data sources, this layer needs to be updated
  * (or replaced) to read from the modern schema.
+ *
+ * @deprecated Use {@link ModernLoanService} with the "modern" or "sqlserver" profile.
+ * This service is kept for backward compatibility with the legacy schema.
  */
 @Service
-public class LoanService {
+@Profile("!modern & !sqlserver")
+public class LoanService implements LoanServiceInterface {
 
     private final LegacyBorrowerRepository borrowerRepository;
     private final LegacyLoanAccountRepository loanAccountRepository;
