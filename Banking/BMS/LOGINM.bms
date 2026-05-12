@@ -1,0 +1,150 @@
+***********************************************************************
+*  LOGINM  - BMS MAP DEFINITION FOR BANKING LOGIN SCREEN             *
+*  CICS TRANSACTION: BLOG                                             *
+*  PROGRAM: LOGINP                                                    *
+***********************************************************************
+LOGINM   DFHMSD TYPE=&SYSPARM,                                        X
+               LANG=COBOL,                                             X
+               MODE=INOUT,                                             X
+               TERM=3270-2,                                            X
+               CTRL=FREEKB,                                            X
+               STORAGE=AUTO,                                           X
+               TIOAPFX=YES
+*
+LOGINI   DFHMDI SIZE=(24,80),                                          X
+               LINE=1,                                                 X
+               COLUMN=1
+*
+***********************************************************************
+*  SCREEN TITLE                                                       *
+***********************************************************************
+         DFHMDF POS=(01,25),                                           X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=GREEN,                                            X
+               INITIAL='================================'
+*
+         DFHMDF POS=(02,25),                                           X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=TURQUOISE,                                        X
+               INITIAL='   BANKING SYSTEM - LOGIN      '
+*
+         DFHMDF POS=(03,25),                                           X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=GREEN,                                            X
+               INITIAL='================================'
+*
+***********************************************************************
+*  WELCOME MESSAGE                                                    *
+***********************************************************************
+         DFHMDF POS=(05,20),                                           X
+               LENGTH=40,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=NEUTRAL,                                          X
+               INITIAL='Welcome to the Banking Application'
+*
+         DFHMDF POS=(06,20),                                           X
+               LENGTH=40,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=NEUTRAL,                                          X
+               INITIAL='Please enter your credentials below:'
+*
+***********************************************************************
+*  USERNAME FIELD                                                     *
+***********************************************************************
+         DFHMDF POS=(09,20),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=GREEN,                                            X
+               INITIAL='USER ID :'
+*
+USERID   DFHMDF POS=(09,32),                                           X
+               LENGTH=08,                                              X
+               ATTRB=(UNPROT,BRT,IC,FSET),                             X
+               COLOR=TURQUOISE,                                        X
+               JUSTIFY=LEFT
+*
+         DFHMDF POS=(09,41),                                           X
+               LENGTH=01,                                              X
+               ATTRB=ASKIP
+*
+***********************************************************************
+*  PASSWORD FIELD                                                     *
+***********************************************************************
+         DFHMDF POS=(11,20),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=GREEN,                                            X
+               INITIAL='PASSWORD :'
+*
+PASSWD   DFHMDF POS=(11,32),                                           X
+               LENGTH=08,                                              X
+               ATTRB=(UNPROT,DRK,FSET),                                X
+               COLOR=TURQUOISE,                                        X
+               JUSTIFY=LEFT
+*
+         DFHMDF POS=(11,41),                                           X
+               LENGTH=01,                                              X
+               ATTRB=ASKIP
+*
+***********************************************************************
+*  MESSAGE LINE                                                       *
+***********************************************************************
+MSGO     DFHMDF POS=(14,20),                                           X
+               LENGTH=40,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=RED
+*
+***********************************************************************
+*  FUNCTION KEY LABELS                                                *
+***********************************************************************
+         DFHMDF POS=(20,05),                                           X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=BLUE,                                             X
+               INITIAL='ENTER = Login                          X
+                        PF3 = Exit'
+*
+***********************************************************************
+*  DATE AND TIME DISPLAY                                              *
+***********************************************************************
+         DFHMDF POS=(22,05),                                           X
+               LENGTH=06,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=GREEN,                                            X
+               INITIAL='DATE :'
+*
+DATEO    DFHMDF POS=(22,12),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=TURQUOISE
+*
+         DFHMDF POS=(22,30),                                           X
+               LENGTH=06,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=GREEN,                                            X
+               INITIAL='TIME :'
+*
+TIMEO    DFHMDF POS=(22,37),                                           X
+               LENGTH=08,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=TURQUOISE
+*
+***********************************************************************
+*  STATUS BAR                                                         *
+***********************************************************************
+         DFHMDF POS=(24,01),                                           X
+               LENGTH=40,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               COLOR=BLUE,                                             X
+               INITIAL='BANKING SYSTEM V1.0'
+*
+ERRMSGO  DFHMDF POS=(24,50),                                           X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               COLOR=RED
+*
+         DFHMSD TYPE=FINAL
+         END

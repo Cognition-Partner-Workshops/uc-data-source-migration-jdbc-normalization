@@ -1,0 +1,67 @@
+//CICSDEF  JOB (BANKING),'CICS RESOURCE DEFS',
+//         CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1),
+//         NOTIFY=&SYSUID
+//*================================================================*
+//*  JOB:  CICSDEF                                                 *
+//*  PURPOSE: DEFINE CICS RESOURCES FOR BANKING APPLICATION        *
+//*================================================================*
+//*
+//CSDUP    EXEC PGM=DFHCSDUP
+//STEPLIB  DD DSN=CICS.SDFHLOAD,DISP=SHR
+//DFHCSD   DD DSN=CICS.DFHCSD,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+*
+*  DEFINE PROGRAM LOGINP
+*
+  DEFINE PROGRAM(LOGINP)
+         GROUP(BANKING)
+         LANGUAGE(COBOL)
+         DATALOCATION(ANY)
+         EXECKEY(USER)
+         STATUS(ENABLED)
+         DESCRIPTION(BANKING LOGIN PROGRAM)
+*
+*  DEFINE TRANSACTION BLOG
+*
+  DEFINE TRANSACTION(BLOG)
+         GROUP(BANKING)
+         PROGRAM(LOGINP)
+         TWASIZE(0)
+         PROFILE(DFHCICST)
+         STATUS(ENABLED)
+         DESCRIPTION(BANKING LOGIN TRANSACTION)
+*
+*  DEFINE MAPSET LOGINM
+*
+  DEFINE MAPSET(LOGINM)
+         GROUP(BANKING)
+         RESIDENT(NO)
+         STATUS(ENABLED)
+         DESCRIPTION(BANKING LOGIN MAP SET)
+*
+*  DEFINE FILE USERFILE
+*
+  DEFINE FILE(USERFILE)
+         GROUP(BANKING)
+         DSNAME(BANKING.USER.MASTER)
+         RECORDFORMAT(F)
+         ADD(YES)
+         BROWSE(YES)
+         DELETE(YES)
+         READ(YES)
+         UPDATE(YES)
+         RLSACCESS(NO)
+         STATUS(ENABLED)
+         OPENTIME(FIRSTREF)
+         DISPOSITION(SHARE)
+         KEYLENGTH(8)
+         RECORDSIZE(99)
+         DESCRIPTION(USER MASTER FILE)
+*
+*  ADD GROUP TO LIST
+*
+  ADD GROUP(BANKING)
+      LIST(BANKLIST)
+/*
+//
