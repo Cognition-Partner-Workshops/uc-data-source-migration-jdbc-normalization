@@ -104,6 +104,12 @@ public class LoanService {
                                                     int page, int size,
                                                     String startDate, String endDate,
                                                     String paymentType) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page index must not be negative");
+        }
+        if (size < 1) {
+            throw new IllegalArgumentException("Page size must be at least 1");
+        }
         if (!loanAccountRepository.existsById(loanAccountNumber)) {
             throw new LoanNotFoundException(loanAccountNumber);
         }
