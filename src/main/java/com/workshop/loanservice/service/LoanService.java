@@ -115,7 +115,8 @@ public class LoanService {
                 .filter(pmt -> matchesDateRange(pmt.getPaymentDate(), startDate, endDate))
                 .filter(pmt -> matchesPaymentType(pmt.getTypeCode(), paymentType))
                 .sorted(Comparator.comparing(
-                        (LegacyPayment p) -> parseLegacyDate(p.getPaymentDate())).reversed())
+                        (LegacyPayment p) -> parseLegacyDate(p.getPaymentDate()),
+                        Comparator.nullsLast(Comparator.naturalOrder())).reversed())
                 .collect(Collectors.toList());
 
         long totalElements = filtered.size();

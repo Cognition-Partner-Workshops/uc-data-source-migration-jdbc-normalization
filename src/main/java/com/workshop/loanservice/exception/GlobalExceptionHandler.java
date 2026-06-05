@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleBadRequest(IllegalArgumentException ex) {
         Map<String, Object> body = Map.of(
                 "error", "Bad Request",
-                "message", ex.getMessage(),
+                "message", ex.getMessage() != null ? ex.getMessage() : "Bad request",
                 "timestamp", Instant.now().toString()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
