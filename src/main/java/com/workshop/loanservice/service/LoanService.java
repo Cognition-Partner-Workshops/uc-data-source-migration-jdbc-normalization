@@ -8,6 +8,7 @@ import com.workshop.loanservice.entity.LegacyBorrower;
 import com.workshop.loanservice.entity.LegacyLoanAccount;
 import com.workshop.loanservice.entity.LegacyLoanProduct;
 import com.workshop.loanservice.entity.LegacyPayment;
+import com.workshop.loanservice.exception.InvalidRequestException;
 import com.workshop.loanservice.exception.LoanNotFoundException;
 import com.workshop.loanservice.repository.LegacyBorrowerRepository;
 import com.workshop.loanservice.repository.LegacyLoanAccountRepository;
@@ -105,10 +106,10 @@ public class LoanService {
                                                     String startDate, String endDate,
                                                     String paymentType) {
         if (page < 0) {
-            throw new IllegalArgumentException("Page index must not be negative");
+            throw new InvalidRequestException("Page index must not be negative");
         }
         if (size < 1) {
-            throw new IllegalArgumentException("Page size must be at least 1");
+            throw new InvalidRequestException("Page size must be at least 1");
         }
         if (!loanAccountRepository.existsById(loanAccountNumber)) {
             throw new LoanNotFoundException(loanAccountNumber);
@@ -130,14 +131,14 @@ public class LoanService {
 
         long totalElements = filtered.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
-        int fromIndex = page * size;
-        int toIndex = Math.min(fromIndex + size, filtered.size());
+        long fromIndex = (long) page * size;
+        int toIndex = (int) Math.min(fromIndex + size, filtered.size());
 
         List<PaymentDto> pageContent;
         if (fromIndex >= filtered.size()) {
             pageContent = List.of();
         } else {
-            pageContent = filtered.subList(fromIndex, toIndex).stream()
+            pageContent = filtered.subList((int) fromIndex, toIndex).stream()
                     .map(this::toPaymentDto)
                     .collect(Collectors.toList());
         }
@@ -184,7 +185,7 @@ public class LoanService {
         try {
             return LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format: " + dateStr + ". Expected yyyy-MM-dd");
+            throw new InvalidRequestException("Invalid date format: " + dateStr + ". Expected yyyy-MM-dd");
         }
     }
 

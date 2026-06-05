@@ -22,8 +22,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, Object>> handleBadRequest(IllegalArgumentException ex) {
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<Map<String, Object>> handleBadRequest(InvalidRequestException ex) {
         Map<String, Object> body = Map.of(
                 "error", "Bad Request",
                 "message", ex.getMessage() != null ? ex.getMessage() : "Bad request",
