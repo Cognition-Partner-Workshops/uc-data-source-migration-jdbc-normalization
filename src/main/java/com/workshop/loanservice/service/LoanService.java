@@ -3,10 +3,12 @@ package com.workshop.loanservice.service;
 import com.workshop.loanservice.dto.BorrowerDto;
 import com.workshop.loanservice.dto.LoanSummaryDto;
 import com.workshop.loanservice.dto.PaymentDto;
+import com.workshop.loanservice.dto.PaymentHistoryResponse;
 import com.workshop.loanservice.entity.LegacyBorrower;
 import com.workshop.loanservice.entity.LegacyLoanAccount;
 import com.workshop.loanservice.entity.LegacyLoanProduct;
 import com.workshop.loanservice.entity.LegacyPayment;
+import com.workshop.loanservice.exception.LoanNotFoundException;
 import com.workshop.loanservice.repository.LegacyBorrowerRepository;
 import com.workshop.loanservice.repository.LegacyLoanAccountRepository;
 import com.workshop.loanservice.repository.LegacyLoanProductRepository;
@@ -14,6 +16,10 @@ import com.workshop.loanservice.repository.LegacyPaymentRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,7 +63,7 @@ public class LoanService {
 
     public LoanSummaryDto getLoanById(String loanAccountNumber) {
         LegacyLoanAccount acct = loanAccountRepository.findById(loanAccountNumber)
-                .orElseThrow(() -> new RuntimeException("Loan not found: " + loanAccountNumber));
+                .orElseThrow(() -> new LoanNotFoundException(loanAccountNumber));
         LegacyLoanProduct product = loanProductRepository.findById(acct.getProductCode())
                 .orElse(null);
         return toLoanSummary(acct, product);
@@ -93,6 +99,92 @@ public class LoanService {
                 .map(this::toPaymentDto)
                 .collect(Collectors.toList());
     }
+
+    public PaymentHistoryResponse getPaymentHistory(String loanAccountNumber,
+                                                    int page, int size,
+                                                    String startDate, String endDate,
+                                                    String paymentType) {
+        if (!loanAccountRepository.existsById(loanAccountNumber)) {
+            throw new LoanNotFoundException(loanAccountNumber);
+        }
+
+        List<LegacyPayment> allPayments = paymentRepository
+                .findByLoanAccountNumberOrderByPaymentDateDesc(loanAccountNumber);
+
+        List<LegacyPayment> filtered = allPayments.stream()
+                .filter(pmt -> matchesDateRange(pmt.getPaymentDate(), startDate, endDate))
+                .filter(pmt -> matchesPaymentType(pmt.getTypeCode(), paymentType))
+                .sorted(Comparator.comparing(
+                        (LegacyPayment p) -> parseLegacyDate(p.getPaymentDate())).reversed())
+                .collect(Collectors.toList());
+
+        long totalElements = filtered.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, filtered.size());
+
+        List<PaymentDto> pageContent;
+        if (fromIndex >= filtered.size()) {
+            pageContent = List.of();
+        } else {
+            pageContent = filtered.subList(fromIndex, toIndex).stream()
+                    .map(this::toPaymentDto)
+                    .collect(Collectors.toList());
+        }
+
+        return new PaymentHistoryResponse(pageContent, page, size, totalElements, totalPages);
+    }
+
+    private boolean matchesDateRange(String paymentDateStr, String startDate, String endDate) {
+        if (startDate == null && endDate == null) {
+            return true;
+        }
+        LocalDate paymentDate = parseLegacyDate(paymentDateStr);
+        if (paymentDate == null) {
+            return false;
+        }
+        if (startDate != null) {
+            LocalDate start = parseIsoDate(startDate);
+            if (paymentDate.isBefore(start)) {
+                return false;
+            }
+        }
+        if (endDate != null) {
+            LocalDate end = parseIsoDate(endDate);
+            if (paymentDate.isAfter(end)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean matchesPaymentType(String typeCode, String paymentType) {
+        if (paymentType == null || paymentType.isBlank()) {
+            return true;
+        }
+        return paymentType.equalsIgnoreCase(typeCode);
+    }
+
+    private LocalDate parseLegacyDate(String dateStr) {
+        if (dateStr == null || dateStr.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(dateStr, LEGACY_DATE_FORMAT);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private LocalDate parseIsoDate(String dateStr) {
+        try {
+            return LocalDate.parse(dateStr);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format: " + dateStr + ". Expected yyyy-MM-dd");
+        }
+    }
+
+    private static final DateTimeFormatter LEGACY_DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     // =========================================================================
     // LEGACY TRANSLATION METHODS
