@@ -114,11 +114,14 @@ public class LoanService {
             throw new LoanNotFoundException(loanAccountNumber);
         }
 
+        LocalDate parsedStart = startDate != null ? parseIsoDate(startDate) : null;
+        LocalDate parsedEnd = endDate != null ? parseIsoDate(endDate) : null;
+
         List<LegacyPayment> allPayments = paymentRepository
                 .findByLoanAccountNumberOrderByPaymentDateDesc(loanAccountNumber);
 
         List<LegacyPayment> filtered = allPayments.stream()
-                .filter(pmt -> matchesDateRange(pmt.getPaymentDate(), startDate, endDate))
+                .filter(pmt -> matchesDateRange(pmt.getPaymentDate(), parsedStart, parsedEnd))
                 .filter(pmt -> matchesPaymentType(pmt.getTypeCode(), paymentType))
                 .sorted(Comparator.comparing(
                         (LegacyPayment p) -> parseLegacyDate(p.getPaymentDate()),
@@ -142,25 +145,19 @@ public class LoanService {
         return new PaymentHistoryResponse(pageContent, page, size, totalElements, totalPages);
     }
 
-    private boolean matchesDateRange(String paymentDateStr, String startDate, String endDate) {
-        if (startDate == null && endDate == null) {
+    private boolean matchesDateRange(String paymentDateStr, LocalDate start, LocalDate end) {
+        if (start == null && end == null) {
             return true;
         }
         LocalDate paymentDate = parseLegacyDate(paymentDateStr);
         if (paymentDate == null) {
             return false;
         }
-        if (startDate != null) {
-            LocalDate start = parseIsoDate(startDate);
-            if (paymentDate.isBefore(start)) {
-                return false;
-            }
+        if (start != null && paymentDate.isBefore(start)) {
+            return false;
         }
-        if (endDate != null) {
-            LocalDate end = parseIsoDate(endDate);
-            if (paymentDate.isAfter(end)) {
-                return false;
-            }
+        if (end != null && paymentDate.isAfter(end)) {
+            return false;
         }
         return true;
     }
