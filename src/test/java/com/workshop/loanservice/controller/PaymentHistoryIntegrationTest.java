@@ -89,6 +89,12 @@ class PaymentHistoryIntegrationTest {
     }
 
     @Test
+    void returns400ForEmptyPaymentTypeList() throws Exception {
+        mockMvc.perform(get(URL, LOAN_ID).param("type", ","))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void existingLoanLookupNowReturns404InsteadOf500() throws Exception {
         mockMvc.perform(get("/api/loans/{id}", "LN-DOES-NOT-EXIST"))
                 .andExpect(status().isNotFound());

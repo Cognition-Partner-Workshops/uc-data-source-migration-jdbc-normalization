@@ -163,8 +163,12 @@ public class LoanService {
     private Set<PaymentType> parsePaymentTypes(String types) {
         Set<PaymentType> result = EnumSet.noneOf(PaymentType.class);
         if (types == null || types.isBlank()) return result;
-        for (String raw : types.split(",")) {
-            if (raw.isBlank()) continue;
+        for (String raw : types.split(",", -1)) {
+            if (raw.isBlank()) {
+                throw new InvalidRequestException(
+                        "type must not contain empty values. Allowed values: "
+                                + Arrays.toString(PaymentType.values()));
+            }
             result.add(PaymentType.fromUserValue(raw).orElseThrow(() -> new InvalidRequestException(
                     "Invalid payment type '" + raw.trim() + "'. Allowed values: "
                             + Arrays.toString(PaymentType.values()))));

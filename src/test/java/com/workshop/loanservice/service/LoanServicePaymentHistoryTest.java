@@ -188,6 +188,21 @@ class LoanServicePaymentHistoryTest {
     }
 
     @Test
+    void rejectsEmptyPaymentTypeTokens() {
+        for (String type : List.of(",", "REG,", ",REG", "REG,,EXT", " , ")) {
+            assertThatThrownBy(() -> history(null, null, type, 0, 20))
+                    .as("type=%s", type)
+                    .isInstanceOf(InvalidRequestException.class)
+                    .hasMessageContaining("empty");
+        }
+    }
+
+    @Test
+    void blankTypeParameterMeansNoFilter() {
+        assertThat(history(null, null, "", 0, 20).getTotalElements()).isEqualTo(6);
+    }
+
+    @Test
     void rejectsNegativePage() {
         assertThatThrownBy(() -> history(null, null, null, -1, 20))
                 .isInstanceOf(InvalidRequestException.class)
