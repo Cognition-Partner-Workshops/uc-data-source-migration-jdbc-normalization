@@ -55,7 +55,36 @@ The app runs on `http://localhost:8080` with endpoints:
 - `GET /api/loans/{id}` — Get loan details
 - `GET /api/borrowers` — List borrowers
 - `GET /api/borrowers/{id}` — Get borrower with loans
-- `GET /api/payments/loan/{loanId}` — Payment history for a loan
+- `GET /api/loans/{id}/payments` — Paginated, filterable payment history for a loan
+
+### Payment history API
+
+`GET /api/loans/{id}/payments`
+
+| Query param | Description | Default |
+|---|---|---|
+| `startDate` | Earliest payment date, inclusive (ISO `yyyy-MM-dd`) | — |
+| `endDate` | Latest payment date, inclusive (ISO `yyyy-MM-dd`) | — |
+| `type` | Comma-separated payment types: `REGULAR`, `EXTRA`, `PARTIAL`, `PREPAYMENT` (legacy codes `REG`/`EXT`/`PRT`/`PRE` and labels are also accepted, case-insensitive) | all |
+| `page` | Zero-based page index | `0` |
+| `size` | Page size (1–100) | `20` |
+
+Results are ordered newest first. Example:
+
+```
+GET /api/loans/LN-2019-00142/payments?startDate=2025-11-01&endDate=2025-12-31&type=REGULAR&page=0&size=10
+```
+
+```json
+{
+  "content": [{ "paymentId": "PMT-2025120001", "paymentDate": "12/15/2025", "totalAmount": 1487.02, "type": "Regular", "status": "Posted", ... }],
+  "page": 0, "size": 10, "totalElements": 2, "totalPages": 1, "first": true, "last": true
+}
+```
+
+Errors use a consistent body (`timestamp`, `status`, `error`, `message`, `path`):
+- `404` — loan does not exist
+- `400` — invalid date format, `startDate` after `endDate`, unknown payment type, or out-of-range `page`/`size`
 
 ## Tech Stack
 
