@@ -55,7 +55,44 @@ The app runs on `http://localhost:8080` with endpoints:
 - `GET /api/loans/{id}` — Get loan details
 - `GET /api/borrowers` — List borrowers
 - `GET /api/borrowers/{id}` — Get borrower with loans
-- `GET /api/payments/loan/{loanId}` — Payment history for a loan
+- `GET /api/loans/{id}/payments` — Paginated payment history for a loan
+
+### Payment History
+
+| Parameter | Default | Description |
+| --- | --- | --- |
+| `page` | `0` | Zero-based page number |
+| `size` | `20` | Number of payments per page (1–100) |
+| `startDate` | — | Inclusive start date in `yyyy-MM-dd` format |
+| `endDate` | — | Inclusive end date in `yyyy-MM-dd` format |
+| `type` | — | Comma-separated payment codes, names, or labels |
+
+Example response:
+
+```json
+{
+  "content": [
+    {
+      "paymentId": "PMT-2025120001",
+      "loanAccountNumber": "LN-2019-00142",
+      "paymentDate": "12/15/2025",
+      "totalAmount": 1487.02,
+      "principalAmount": 456.78,
+      "interestAmount": 1074.69,
+      "escrowAmount": 355.55,
+      "lateFee": 0.00,
+      "type": "Regular",
+      "status": "Posted"
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 2,
+  "totalPages": 1,
+  "first": true,
+  "last": true
+}
+```
 
 ## Tech Stack
 

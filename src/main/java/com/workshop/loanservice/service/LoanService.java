@@ -2,11 +2,15 @@ package com.workshop.loanservice.service;
 
 import com.workshop.loanservice.dto.BorrowerDto;
 import com.workshop.loanservice.dto.LoanSummaryDto;
+import com.workshop.loanservice.dto.PagedResponse;
 import com.workshop.loanservice.dto.PaymentDto;
+import com.workshop.loanservice.dto.PaymentType;
 import com.workshop.loanservice.entity.LegacyBorrower;
 import com.workshop.loanservice.entity.LegacyLoanAccount;
 import com.workshop.loanservice.entity.LegacyLoanProduct;
 import com.workshop.loanservice.entity.LegacyPayment;
+import com.workshop.loanservice.exception.InvalidRequestException;
+import com.workshop.loanservice.exception.LoanNotFoundException;
 import com.workshop.loanservice.repository.LegacyBorrowerRepository;
 import com.workshop.loanservice.repository.LegacyLoanAccountRepository;
 import com.workshop.loanservice.repository.LegacyLoanProductRepository;
@@ -14,8 +18,15 @@ import com.workshop.loanservice.repository.LegacyPaymentRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +40,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class LoanService {
+
+    private static final DateTimeFormatter PAYMENT_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MM/dd/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     private final LegacyBorrowerRepository borrowerRepository;
     private final LegacyLoanAccountRepository loanAccountRepository;
@@ -57,7 +71,7 @@ public class LoanService {
 
     public LoanSummaryDto getLoanById(String loanAccountNumber) {
         LegacyLoanAccount acct = loanAccountRepository.findById(loanAccountNumber)
-                .orElseThrow(() -> new RuntimeException("Loan not found: " + loanAccountNumber));
+                .orElseThrow(() -> new LoanNotFoundException(loanAccountNumber));
         LegacyLoanProduct product = loanProductRepository.findById(acct.getProductCode())
                 .orElse(null);
         return toLoanSummary(acct, product);
@@ -87,11 +101,140 @@ public class LoanService {
         return dto;
     }
 
-    public List<PaymentDto> getPaymentsByLoan(String loanAccountNumber) {
-        return paymentRepository.findByLoanAccountNumberOrderByPaymentDateDesc(loanAccountNumber)
-                .stream()
-                .map(this::toPaymentDto)
+    public PagedResponse<PaymentDto> getPaymentHistory(String loanId, String startDate, String endDate,
+                                                        String type, int page, int size) {
+        if (page < 0) {
+            throw new InvalidRequestException("page must be non-negative");
+        }
+        if (size < 1 || size > 100) {
+            throw new InvalidRequestException("size must be between 1 and 100");
+        }
+
+        LocalDate start = parseRequestDate(startDate, "startDate");
+        LocalDate end = parseRequestDate(endDate, "endDate");
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new InvalidRequestException("startDate must be on or before endDate");
+        }
+        Set<String> typeCodes = parsePaymentTypeCodes(type);
+
+        if (!loanAccountRepository.existsById(loanId)) {
+            throw new LoanNotFoundException(loanId);
+        }
+
+        boolean hasDateFilter = start != null || end != null;
+        List<PaymentRecord> payments = paymentRepository.findByLoanAccountNumber(loanId).stream()
+                .map(payment -> new PaymentRecord(payment, parsePaymentDate(payment.getPaymentDate())))
+                .filter(record -> {
+                    if (hasDateFilter && record.paymentDate() == null) {
+                        return false;
+                    }
+                    if (start != null && record.paymentDate().isBefore(start)) {
+                        return false;
+                    }
+                    if (end != null && record.paymentDate().isAfter(end)) {
+                        return false;
+                    }
+                    return typeCodes == null || typeCodes.contains(record.payment().getTypeCode());
+                })
+                .sorted(LoanService::comparePaymentRecords)
                 .collect(Collectors.toList());
+
+        long totalElements = payments.size();
+        long offset = (long) page * size;
+        int fromIndex = (int) Math.min(offset, totalElements);
+        int toIndex = (int) Math.min(offset + size, totalElements);
+        List<PaymentDto> content = payments.subList(fromIndex, toIndex).stream()
+                .map(record -> toPaymentDto(record.payment()))
+                .collect(Collectors.toList());
+        return new PagedResponse<>(content, page, size, totalElements);
+    }
+
+    private LocalDate parseRequestDate(String value, String parameter) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException exception) {
+            throw new InvalidRequestException(parameter + " must be a valid ISO date (yyyy-MM-dd)");
+        }
+    }
+
+    private Set<String> parsePaymentTypeCodes(String type) {
+        if (type == null) {
+            return null;
+        }
+        Set<PaymentType> paymentTypes = EnumSet.noneOf(PaymentType.class);
+        for (String token : type.split(",", -1)) {
+            String candidate = token.trim();
+            if (candidate.isEmpty()) {
+                throw new InvalidRequestException("type must contain non-blank payment type values");
+            }
+            PaymentType paymentType = PaymentType.from(candidate)
+                    .orElseThrow(() -> new InvalidRequestException(
+                            "Unknown payment type '" + candidate + "'. Valid values: " + validPaymentTypes()));
+            paymentTypes.add(paymentType);
+        }
+        if (paymentTypes.isEmpty()) {
+            throw new InvalidRequestException("type must contain at least one payment type");
+        }
+        return paymentTypes.stream()
+                .map(PaymentType::getCode)
+                .collect(Collectors.toSet());
+    }
+
+    private String validPaymentTypes() {
+        return java.util.Arrays.stream(PaymentType.values())
+                .map(paymentType -> paymentType.name() + " (" + paymentType.getCode()
+                        + ", " + paymentType.getLabel() + ")")
+                .collect(Collectors.joining(", "));
+    }
+
+    private LocalDate parsePaymentDate(String paymentDate) {
+        if (paymentDate == null) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(paymentDate, PAYMENT_DATE_FORMAT);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
+    }
+
+    private static int comparePaymentRecords(PaymentRecord left, PaymentRecord right) {
+        LocalDate leftDate = left.paymentDate();
+        LocalDate rightDate = right.paymentDate();
+        if (leftDate == null && rightDate != null) {
+            return 1;
+        }
+        if (leftDate != null && rightDate == null) {
+            return -1;
+        }
+        if (leftDate != null) {
+            int dateComparison = rightDate.compareTo(leftDate);
+            if (dateComparison != 0) {
+                return dateComparison;
+            }
+        }
+        return compareSequenceNumbersDescending(
+                left.payment().getPaymentSequenceNumber(), right.payment().getPaymentSequenceNumber());
+    }
+
+    private static int compareSequenceNumbersDescending(String left, String right) {
+        if (left == null) {
+            return right == null ? 0 : 1;
+        }
+        if (right == null) {
+            return -1;
+        }
+        try {
+            return new BigInteger(right.trim()).compareTo(new BigInteger(left.trim()));
+        } catch (NumberFormatException exception) {
+            return right.compareTo(left);
+        }
+    }
+
+    private record PaymentRecord(LegacyPayment payment, LocalDate paymentDate) {
     }
 
     // =========================================================================

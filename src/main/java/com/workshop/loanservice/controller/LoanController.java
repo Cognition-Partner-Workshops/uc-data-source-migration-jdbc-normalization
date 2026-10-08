@@ -1,10 +1,12 @@
 package com.workshop.loanservice.controller;
 
 import com.workshop.loanservice.dto.LoanSummaryDto;
+import com.workshop.loanservice.dto.PagedResponse;
 import com.workshop.loanservice.dto.PaymentDto;
 import com.workshop.loanservice.service.LoanService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,8 +32,14 @@ public class LoanController {
         return loanService.getLoanById(id);
     }
 
-    @GetMapping("/{loanId}/payments")
-    public List<PaymentDto> getPayments(@PathVariable String loanId) {
-        return loanService.getPaymentsByLoan(loanId);
+    @GetMapping("/{id}/payments")
+    public PagedResponse<PaymentDto> getPayments(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String type) {
+        return loanService.getPaymentHistory(id, startDate, endDate, type, page, size);
     }
 }
